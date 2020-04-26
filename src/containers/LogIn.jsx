@@ -36,10 +36,9 @@ const useStyles = (theme) => ({
   },
 });
 
-class SignUp extends Component {
+class LogIn extends Component {
   render() {
     const { classes } = this.props;
-    // debugger;
     return (
       <Container component="main" maxWidth="xs">
         <div className={classes.paper}>
@@ -47,7 +46,7 @@ class SignUp extends Component {
             <LockIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign up
+            Log In
           </Typography>
           <form className={classes.form} noValidate>
             <Grid container spacing={2}>
@@ -82,12 +81,12 @@ class SignUp extends Component {
               color="primary"
               className={classes.submit}
             >
-              Sign Up
+              Log In
             </Button>
             <Grid container justify="flex-end">
               <Grid item>
-                <Link variant="body2" onClick={() => this.props.toLogIn()}>
-                  Already have an account? Log in
+                <Link variant="body2" onClick={() => this.props.toSignUp()}>
+                  Don't have an account yet? Sign up here
                 </Link>
               </Grid>
             </Grid>
@@ -103,8 +102,9 @@ const mapStateToProps = (state, ownProps) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  toLogIn: () => dispatch(push('/login')),
+  toSignUp: () => dispatch(push('/')),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(useStyles)(SignUp));
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(useStyles)(LogIn));
+// export default withStyles(useStyles)(LogIn)
 

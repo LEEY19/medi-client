@@ -1,25 +1,34 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { Route, Switch } from 'react-router-dom';
 import Loadable from 'react-loadable';
 import Loading from '../components/Loading';
 
-class App extends Component {
+// let match = useRouteMatch();
+
+export default class App extends Component {
+
   render() {
     return (
-      <Router>
-        <Switch>
-          <Route
-            path="/"
-            exact={true}
-            component={Loadable({
-              loader: () => import('./SignUp'),
-              loading: Loading,
-            })}
-          />
-        </Switch>
-      </Router>
+      <Switch>
+        <Route
+          path='/'
+          exact={true}
+          component={Loadable({
+            loader: () => import('./SignUp'),
+            loading: Loading,
+          })}
+        />
+        <Route
+          path='/login'
+          exact={true}
+          component={Loadable({
+            loader: () => import('./LogIn'),
+            loading: Loading,
+          })}
+        />
+      </Switch>
     );
   }
 }
 
-export default App;
+
