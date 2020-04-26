@@ -15,6 +15,8 @@ import {
   Container
 } from '@material-ui/core';
 
+import * as UserContext from '../contexts/user';
+
 const useStyles = (theme) => ({
   paper: {
     marginTop: theme.spacing(8),
@@ -37,6 +39,27 @@ const useStyles = (theme) => ({
 });
 
 class SignUp extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      email: null,
+      password: null
+    };
+  }
+
+  handlePasswordChange = (event) => {
+    this.setState({
+      password: event.target.value,
+    });
+  };
+
+  handleEmailChange = (event) => {
+    this.setState({
+      email: event.target.value,
+    });
+  };
+
   render() {
     const { classes } = this.props;
     // debugger;
@@ -59,7 +82,7 @@ class SignUp extends Component {
                   id="email"
                   label="Email Address"
                   name="email"
-                  autoComplete="email"
+                  onChange={this.handleEmailChange}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -71,16 +94,16 @@ class SignUp extends Component {
                   label="Password"
                   type="password"
                   id="password"
-                  autoComplete="current-password"
+                  onChange={this.handlePasswordChange}
                 />
               </Grid>
             </Grid>
             <Button
-              type="submit"
               fullWidth
               variant="contained"
               color="primary"
               className={classes.submit}
+              onClick={() => this.props.signUp(this.state.email, this.state.password)}
             >
               Sign Up
             </Button>
@@ -104,6 +127,7 @@ const mapStateToProps = (state, ownProps) => ({
 
 const mapDispatchToProps = dispatch => ({
   toLogIn: () => dispatch(push('/login')),
+  signUp: (email, password) => dispatch(UserContext.signUp(email, password))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withStyles(useStyles)(SignUp));

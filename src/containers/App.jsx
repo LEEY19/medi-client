@@ -26,6 +26,14 @@ export default class App extends Component {
             loading: Loading,
           })}
         />
+        <Route
+          path='/files'
+          exact={true}
+          component={Loadable({
+            loader: () => import('./Files'),
+            loading: Loading,
+          })}
+        />
       </Switch>
     );
   }
