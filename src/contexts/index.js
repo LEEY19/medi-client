@@ -1,8 +1,14 @@
-import * as Reducer from '../lib/reducer';
+import { combineReducers } from 'redux';
 import * as UserContext from './user';
+import * as FileContext from './file';
 // import { routerReducer } from 'react-router-redux';
 
-export const reducer = Reducer.combine({
-  user: UserContext.reducer,
+export const appReducer = combineReducers(
+  Object.assign(
+    {},
+    {
+    user: UserContext.reducer,
+    files: FileContext.reducer
+    },
   // router: routerReducer,
-});
+));

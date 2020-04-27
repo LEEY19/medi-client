@@ -2,29 +2,29 @@ import axios from 'axios'
 import root from 'window-or-global'
 
 export default class API {
-  static get client() {
+  static client(auth) {
     return axios.create({
-      baseURL: process.env.REACT_APP_API,
+      baseURL: root.__baseURL__,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${root.__TOKEN__}`,
+        'Authorization': `Bearer ${auth}`,
       }
     })
   }
 
-  static post(path, params) {
-    return API.client.post(path, params)
+  static post(path, auth, params) {
+    return API.client(auth).post(path, params)
   }
 
-  static put(path, params) {
-    return API.client.put(path, params)
+  static put(path, auth, params) {
+    return API.client(auth).put(path, params)
   }
 
-  static delete(path, params) {
-    return API.client.delete(path, params)
+  static delete(path, auth, params) {
+    return API.client(auth).delete(path, params)
   }
 
-  static get(path) {
-    return API.client.get(path)
+  static get(path, auth) {
+    return API.client(auth).get(path)
   }
 }

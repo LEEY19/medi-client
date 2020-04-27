@@ -1,30 +1,136 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-// import { push } from 'connected-react-router'
-// import { makeStyles, withStyles, withTheme } from '@material-ui/core/styles';
-// import LockIcon from '@material-ui/icons/Lock';
+import Dropzone from 'react-dropzone';
+import { 
+  Button, 
+  Avatar, 
+  TextField, 
+  FormControlLabel,
+  Checkbox,
+  Link,
+  Grid,
+  Typography,
+  Container,
+  Box,
+  CircularProgress
+} from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+
+import UpdateButton from '../components/UpdateButton';
+import DeleteButton from '../components/DeleteButton';
+// import Loading from '../components/Loading';
+import Title from '../components/Title';
 
 import * as FileContext from '../contexts/file';
+import * as UserContext from '../contexts/user';
 
 class Files extends Component {
-  componentDidMount() {
-    var user = this.state.user;
-    debugger;
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      uploadedFile: null,
+    };
+  }  
+
+  componentWillMount() {
+    this.props.getFiles()
   }
 
   render() {
-    return (
-      <p></p>
-    );
+    const {files, gettingFiles} = this.props.files;
+    const {uploadedFile} = this.state;
+    if (gettingFiles) {
+      return (
+        <Box display="flex" justifyContent="center" alignItems="center">
+          <CircularProgress/>
+        </Box>
+      );
+    } else {
+      return (
+        <Container component="main" maxWidth="md">
+          <Box display="flex" flexDirection="row" justifyContent="space-between" marginBottom="20px" marginTop="20px">
+            <Dropzone onDrop={acceptedFiles => this.setState({uploadedFile: acceptedFiles[0]})}>
+              {({getRootProps, getInputProps}) => (
+                <div {...getRootProps()}>
+                  <input {...getInputProps()} />
+                    <Button variant="contained" color="primary" component="span">
+                      Select File
+                    </Button>
+                </div>
+              )}
+            </Dropzone>
+            <Link color="primary" onClick={() => this.props.logOut(this.props.user.email)}>
+              <Typography component="h3" variant="h6" color="primary">
+                Sign Out
+              </Typography>
+            </Link> 
+          </Box>
+          {uploadedFile
+            ? (
+              <Box display="flex" flexDirection="row" marginBottom="20px" marginTop="20px">
+                <Box marginRight={20}>
+                <Button variant="contained" color="primary" component="span" 
+                onClick={() => this.props.uploadFile(uploadedFile)}
+                >
+                  Upload File
+                </Button>
+                </Box>
+                <Typography component="h4" variant="h6">
+                  {uploadedFile.name}
+                </Typography>
+              </Box>
+            ) : (
+              <Box />
+            )
+          }
+
+          <React.Fragment>
+            <Title>Files</Title>
+            <Table size="medium">
+              <TableHead>
+                <TableRow>
+                  <TableCell>No.</TableCell>
+                  <TableCell>Name</TableCell>
+                  <TableCell align="right">Delete File</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {files.map((row, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>
+                      <Link color="primary" onClick={() => this.props.downloadFile(row.id, row.name)}>{row.name}</Link>
+                    </TableCell>
+                    <TableCell align="right"><DeleteButton deleteFile={this.props.deleteFile} id={row.id}/></TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </React.Fragment>
+
+        </Container>
+      );
+    }
   }
-};
+}
 
 const mapStateToProps = (state, ownProps) => ({
-  user: state.user
+  user: state.user,
+  files: state.files
 });
 
 const mapDispatchToProps = dispatch => ({
   getFiles: () => dispatch(FileContext.getFiles()),
+  uploadFile: (file) => dispatch(FileContext.uploadFile(file)),
+  downloadFile: (id, name) => dispatch(FileContext.downloadFile(id, name)),
+  deleteFile: (id) => dispatch(FileContext.deleteFile(id)),
+  logOut: (email) => dispatch(UserContext.logOut(email)),
   // logIn: (email, password) => dispatch(UserContext.logIn(email, password))
 });
 
