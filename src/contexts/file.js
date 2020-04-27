@@ -1,32 +1,147 @@
 import API from '../lib/api';
-import * as Reducer from '../lib/reducer';
+import * as InitialStates from '../lib/initialStates';
+import createReducer from '../lib/createReducer';
 import { push } from 'connected-react-router'
-import root from 'window-or-global'
+// import download from 'downloadjs';
+import fileDownload from 'js-file-download';
 
 //types
-// export const SET_USER = 'SET_USER';
-
+export const SET_FILES = 'SET_FILES';
+export const TOGGLE_FILE_LOADING = 'TOGGLE_FILE_LOADING';
+export const APPEND_FILE = 'APPEND_FILE';
+export const REMOVE_FILE = 'REMOVE_FILE';
+export const LOG_OUT = 'LOG_OUT';
 //actions
-// export const setUser = user => ({
-//   type: SET_USER,
-//   payload: user,
-// });
 
-export const getFiles = () => dispatch => {
+export function getFiles() {
+  return (dispatch, getState) => {
+    // var state = getState();
+    // console.log(state)
+    let token = getState().user.token;
 
-  return API.get(`/api/users/current`)
-    // .then(res => dispatch(setUser(res.data)))
-    .then(res => {
-      console.log("win")
-      // dispatch(push('/login'));
-    })
-    .catch(err => {
-      console.log(err);
-    });
-};
+    if (!token) { return dispatch(push('/login')) };
 
+    dispatch({type: TOGGLE_FILE_LOADING});
+    return API.get(`/api/files/all`, token)
+      .then(response => {
+        // debugger;
+        const payload = {
+          type: SET_FILES,
+          files: response.data,
+        };
+        dispatch(payload);
+        // debugger;
+        dispatch({type: TOGGLE_FILE_LOADING});
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
+}
+
+export function uploadFile(file) {
+  return (dispatch, getState) => {
+    // var state = getState();
+    // console.log(state)
+    let token = getState().user.token;
+
+    if (!token) { return dispatch(push('/login')) };
+
+    dispatch({type: TOGGLE_FILE_LOADING});
+    const formData = new FormData(); 
+     
+    // Update the formData object 
+    formData.append('uploadfile', file); 
+
+    return API.post(`/api/files/upload`, token, formData)
+      .then(response => {
+        const payload = {
+          type: APPEND_FILE,
+          file: {id: response.data.id, name: response.data.file.originalname},
+        };
+        dispatch(payload);
+
+        dispatch({type: TOGGLE_FILE_LOADING});
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
+}
+
+
+export function downloadFile(id, name) {
+  return (dispatch, getState) => {
+    // var state = getState();
+    // console.log(state)
+    let token = getState().user.token;
+
+    if (!token) { return dispatch(push('/login')) };
+
+    dispatch({type: TOGGLE_FILE_LOADING});
+
+    return API.get(`/api/files/download/${id}`, token)
+      .then(response => {
+
+        console.log(response)
+        console.log(id + " " + name)
+        dispatch({type: TOGGLE_FILE_LOADING});
+        fileDownload(response.data, name)
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
+}
+
+export function deleteFile(id) {
+  return (dispatch, getState) => {
+
+    let token = getState().user.token;
+
+    if (!token) { return dispatch(push('/login')) };
+
+    dispatch({type: TOGGLE_FILE_LOADING});
+
+    return API.delete(`/api/files/deletefile/${id}`, token)
+      .then(response => {
+        if (response.status == 200) {
+          const payload = {
+            type: REMOVE_FILE,
+            id
+          };
+          dispatch(payload);
+        };
+        dispatch({type: TOGGLE_FILE_LOADING});
+        // fileDownload(response.data, name)
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
+}
 
 // reducers
-export const reducer = Reducer.matchWith({
-  // [SET_USER]: (state, action) => state.merge(action.payload),
+export const reducer = createReducer(InitialStates.files, {
+  [SET_FILES](state, action) {
+    return Object.assign({}, state, action.files);
+  },
+  [APPEND_FILE](state, action) {
+    var existing_files = state.files;
+    existing_files.push(action.file);
+    return Object.assign({}, state, {files: existing_files});
+  },
+  [REMOVE_FILE](state, action) {
+    var existing_files = state.files;
+    existing_files = existing_files.filter((value) => {
+      return value.id !== action.id 
+    })
+    return Object.assign({}, state, {files: existing_files});
+  },  
+  [TOGGLE_FILE_LOADING](state, action) {
+    return Object.assign({}, state, {gettingFiles: !state.gettingFiles});
+  },
+  [LOG_OUT](state, action) {
+    return Object.assign({}, state, {files: [], gettingFiles: false});
+  },
 });
