@@ -7,8 +7,28 @@ import { push } from 'connected-react-router'
 //types
 export const SET_USER = 'SET_USER';
 export const LOG_OUT = 'LOG_OUT';
+export const LOGIN_FAILED = 'LOGIN_FAILED';
+export const SIGNUP_FAILED = 'SIGNUP_FAILED';
+export const SIGNUP_SUCCESS = 'SIGNUP_SUCCESS';
+export const REMOVE_MESSAGE = 'REMOVE_MESSAGE';
 
 //actions
+
+const loginFailed = () => {
+  return { type: LOGIN_FAILED }
+}
+
+const signupFailed = () => {
+  return { type: SIGNUP_FAILED }
+}
+
+const signupSuccess = () => {
+  return { type: SIGNUP_SUCCESS }
+}
+
+export const removeMessage = () => {
+  return { type: REMOVE_MESSAGE }
+}
 
 export function signUp(email, password) {
   return (dispatch, getState) => {
@@ -21,10 +41,14 @@ export function signUp(email, password) {
 
     return API.post(`/api/users`, token, signup_details)
       .then(response => {
-        dispatch(push('/login'));
+        dispatch(signupSuccess());
+        setTimeout(() => {
+          dispatch(push('/login'));
+        }, 2000);
       })
       .catch(error => {
-        console.log(error);
+        console.log(error)
+        dispatch(signupFailed());
       });
   };
 }
@@ -39,6 +63,7 @@ export function logIn(email, password) {
 
     return API.post(`/api/users/login`, token, login_details)
       .then(response => {
+        // debugger
         const payload = {
           type: SET_USER,
           user: response.data.user,
@@ -47,7 +72,7 @@ export function logIn(email, password) {
         dispatch(push('/files'));
       })
       .catch(error => {
-        console.log(error);
+        dispatch(loginFailed());
       });
   };
 }
@@ -82,6 +107,18 @@ export const reducer = createReducer(InitialStates.user, {
   },
   [LOG_OUT](state, action) {
     return Object.assign({}, state, {email: null, token: null});
+  },
+  [LOGIN_FAILED](state, action) {
+    return Object.assign({}, state, { error: true, userMessage: "Unable to log in, make sure account is created and credentials are correct." });
+  },
+  [SIGNUP_SUCCESS](state, action) {
+    return Object.assign({}, state, { error: false, userMessage: "Successful sign up. Now log in." });
+  },  
+  [SIGNUP_FAILED](state, action) {
+    return Object.assign({}, state, { error: true, userMessage: "Unable to sign up." });
+  },
+  [REMOVE_MESSAGE](state, action) {
+    return Object.assign({}, state, { error: false, userMessage: null });
   },
 });
 

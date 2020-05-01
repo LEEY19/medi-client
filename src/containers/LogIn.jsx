@@ -12,7 +12,8 @@ import {
   Link,
   Grid,
   Typography,
-  Container
+  Container,
+  Box
 } from '@material-ui/core';
 
 import * as UserContext from '../contexts/user';
@@ -44,8 +45,23 @@ class LogIn extends Component {
 
     this.state = {
       email: null,
-      password: null
+      password: null,
+      error: false,
+      userMessage: null
     };
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.error !== this.props.user.error) {
+      const {error, userMessage} = this.props.user;
+      this.setState({error, userMessage});
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.state.error) {
+      this.props.removeMessage()
+    }
   }
 
   handlePasswordChange = (event) => {
@@ -62,6 +78,7 @@ class LogIn extends Component {
 
   render() {
     const { classes } = this.props;
+    const { error, userMessage } = this.state;
     return (
       <Container component="main" maxWidth="xs">
         <div className={classes.paper}>
@@ -115,18 +132,24 @@ class LogIn extends Component {
             </Grid>
           </form>
         </div>
+        {error 
+          ? (
+              <p>{userMessage}</p>
+          ) : null
+        }
       </Container>
     );
   }
 };
 
 const mapStateToProps = (state, ownProps) => ({
-  location: ownProps.location
+  user: state.user
 });
 
 const mapDispatchToProps = dispatch => ({
   toSignUp: () => dispatch(push('/')),
-  logIn: (email, password) => dispatch(UserContext.logIn(email, password))
+  logIn: (email, password) => dispatch(UserContext.logIn(email, password)),
+  removeMessage: (email, password) => dispatch(UserContext.removeMessage())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withStyles(useStyles)(LogIn));

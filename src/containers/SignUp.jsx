@@ -44,8 +44,22 @@ class SignUp extends Component {
 
     this.state = {
       email: null,
-      password: null
+      password: null,
+      error: false,
+      userMessage: null
     };
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.user.userMessage !== this.props.user.userMessage) {
+      this.setState({userMessage: this.props.user.userMessage});
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.state.userMessage) {
+      this.props.removeMessage()
+    }
   }
 
   handlePasswordChange = (event) => {
@@ -62,7 +76,7 @@ class SignUp extends Component {
 
   render() {
     const { classes } = this.props;
-    // debugger;
+    const { email, password, userMessage } = this.state;
     return (
       <Container component="main" maxWidth="xs">
         <div className={classes.paper}>
@@ -103,7 +117,7 @@ class SignUp extends Component {
               variant="contained"
               color="primary"
               className={classes.submit}
-              onClick={() => this.props.signUp(this.state.email, this.state.password)}
+              onClick={() => this.props.signUp(email, password)}
             >
               Sign Up
             </Button>
@@ -116,18 +130,24 @@ class SignUp extends Component {
             </Grid>
           </form>
         </div>
+        {userMessage 
+          ? (
+              <p>{userMessage}</p>
+          ) : null
+        }
       </Container>
     );
   }
 };
 
 const mapStateToProps = (state, ownProps) => ({
-  location: ownProps.location
+  user: state.user
 });
 
 const mapDispatchToProps = dispatch => ({
   toLogIn: () => dispatch(push('/login')),
-  signUp: (email, password) => dispatch(UserContext.signUp(email, password))
+  signUp: (email, password) => dispatch(UserContext.signUp(email, password)),
+  removeMessage: (email, password) => dispatch(UserContext.removeMessage())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withStyles(useStyles)(SignUp));

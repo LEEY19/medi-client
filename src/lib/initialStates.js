@@ -4,7 +4,9 @@ import { OrderedMap, Map } from 'immutable';
 //user store
 export const user = {
   email: null,
-  token: null
+  token: null,
+  error: false,
+  userMessage: null
 };
 
 // files store
