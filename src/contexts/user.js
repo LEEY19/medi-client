@@ -63,13 +63,14 @@ export function logIn(email, password) {
 
     return API.post(`/api/users/login`, token, login_details)
       .then(response => {
-        // debugger
         const payload = {
           type: SET_USER,
           user: response.data.user,
         };
         dispatch(payload);
-        dispatch(push('/files'));
+        setTimeout(() => {
+          dispatch(push('/files'));
+        }, 1000);
       })
       .catch(error => {
         dispatch(loginFailed());
@@ -93,7 +94,7 @@ export function logOut(email) {
         dispatch(push('/login'));
       })
       .catch(error => {
-        console.log(error);
+        console.log(error.response);
       });
   };
 }

@@ -12,5 +12,6 @@ export const user = {
 // files store
 export const files = {
   files: [],
-  gettingFiles: false
+  gettingFiles: false,
+  fileMessage: null
 };

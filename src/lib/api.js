@@ -1,14 +1,22 @@
-import axios from 'axios'
-import root from 'window-or-global'
+import axios from 'axios';
+import axiosCookieJarSupport from 'axios-cookiejar-support';
+import tough from 'tough-cookie';
+import root from 'window-or-global';
+
+axiosCookieJarSupport(axios);
+const cookieJar = new tough.CookieJar();
 
 export default class API {
   static client(auth) {
+    // debugger;
     return axios.create({
       baseURL: root.__baseURL__,
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${auth}`,
-      }
+      },
+      withCredentials: true,
+      jar: cookieJar,
     })
   }
 
