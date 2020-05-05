@@ -2,8 +2,6 @@ import API from '../lib/api';
 import * as InitialStates from '../lib/initialStates';
 import createReducer from '../lib/createReducer';
 import { push } from 'connected-react-router'
-// import download from 'downloadjs';
-import fileDownload from 'js-file-download';
 
 //types
 export const SET_FILES = 'SET_FILES';
@@ -53,8 +51,7 @@ export function clearFileState() {
 
 export function uploadFile(file) {
   return (dispatch, getState) => {
-    // var state = getState();
-    // console.log(state)
+
     let token = getState().user.token;
 
     if (!token) { return dispatch(push('/login')) };
@@ -69,35 +66,11 @@ export function uploadFile(file) {
       .then(response => {
         const payload = {
           type: APPEND_FILE,
-          file: {id: response.data.id, name: response.data.file.originalname},
+          file: {id: response.data.id, name: response.data.file.originalname, filepath: response.data.filepath + response.data.file.originalname},
         };
         dispatch(payload);
         dispatch(insertFileMessage(response.data.msg));
         dispatch({type: TOGGLE_FILE_LOADING});
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  };
-}
-
-
-export function downloadFile(id, name) {
-  return (dispatch, getState) => {
-
-    let token = getState().user.token;
-
-    if (!token) { return dispatch(push('/login')) };
-
-    dispatch({type: TOGGLE_FILE_LOADING});
-
-    return API.get(`/api/files/download/${id}`, token)
-      .then(response => {
-
-        console.log(response)
-        console.log(id + " " + name)
-        dispatch({type: TOGGLE_FILE_LOADING});
-        fileDownload(response.data, name)
       })
       .catch(err => {
         console.log(err);
