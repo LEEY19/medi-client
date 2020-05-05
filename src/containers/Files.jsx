@@ -89,7 +89,10 @@ class Files extends Component {
               <Box display="flex" flexDirection="row" marginBottom="20px" marginTop="20px">
                 <Box marginRight={20}>
                 <Button variant="contained" color="primary" component="span" 
-                onClick={() => this.props.uploadFile(uploadedFile)}
+                onClick={() => {
+                  this.props.uploadFile(uploadedFile);
+                  this.setState({uploadedFile: null});
+                }}
                 >
                   Upload File
                 </Button>
@@ -118,7 +121,7 @@ class Files extends Component {
                   <TableRow key={index}>
                     <TableCell>{index + 1}</TableCell>
                     <TableCell>
-                      <Link color="primary" onClick={() => this.props.downloadFile(row.id, row.name)}>{row.name}</Link>
+                      <Link color="primary" href={row.filepath} target="_blank">{row.name}</Link>
                     </TableCell>
                     <TableCell align="right"><DeleteButton deleteFile={this.props.deleteFile} id={row.id}/></TableCell>
                   </TableRow>
@@ -146,10 +149,8 @@ const mapDispatchToProps = dispatch => ({
   getFiles: () => dispatch(FileContext.getFiles()),
   clearFileState: () => dispatch(FileContext.clearFileState()),
   uploadFile: (file) => dispatch(FileContext.uploadFile(file)),
-  downloadFile: (id, name) => dispatch(FileContext.downloadFile(id, name)),
   deleteFile: (id) => dispatch(FileContext.deleteFile(id)),
   logOut: (email) => dispatch(UserContext.logOut(email)),
-  // logIn: (email, password) => dispatch(UserContext.logIn(email, password))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Files);
