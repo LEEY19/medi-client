@@ -8,7 +8,6 @@ const cookieJar = new tough.CookieJar();
 
 export default class API {
   static client(auth) {
-    // debugger;
     return axios.create({
       baseURL: root.__baseURL__,
       headers: {

@@ -34,7 +34,7 @@ const createRootReducer = (history) => combineReducers({
 const persistConfig = {
   key: 'root',
   storage,
-  blacklist: ['user', 'files', 'router']
+  // blacklist: ['user', 'files', 'router']
 }
 
 const configureStore = initialState => {
