@@ -9,6 +9,7 @@
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
     "axios": "^0.19.2",
+    "axios-cookiejar-support": "^1.0.0",
     "connected-react-router": "^6.8.0",
     "downloadjs": "^1.4.7",
     "immutable": "^4.0.0-rc.12",
@@ -24,6 +25,7 @@
     "redux": "^4.0.5",
     "redux-persist": "^6.0.0",
     "redux-thunk": "^2.3.0",
+    "tough-cookie": "^4.0.0",
     "window-or-global": "^1.0.1"
   },
   "scripts": {

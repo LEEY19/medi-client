@@ -7,16 +7,21 @@ import fileDownload from 'js-file-download';
 
 //types
 export const SET_FILES = 'SET_FILES';
+export const CLEAR_FILE_STATE = 'CLEAR_FILE_STATE';
 export const TOGGLE_FILE_LOADING = 'TOGGLE_FILE_LOADING';
+export const INSERT_FILE_MESSAGE = 'INSERT_FILE_MESSAGE';
 export const APPEND_FILE = 'APPEND_FILE';
 export const REMOVE_FILE = 'REMOVE_FILE';
 export const LOG_OUT = 'LOG_OUT';
 //actions
 
+const insertFileMessage = (message) => {
+  return { type: INSERT_FILE_MESSAGE, message }
+}
+
 export function getFiles() {
   return (dispatch, getState) => {
-    // var state = getState();
-    // console.log(state)
+
     let token = getState().user.token;
 
     if (!token) { return dispatch(push('/login')) };
@@ -30,12 +35,19 @@ export function getFiles() {
           files: response.data,
         };
         dispatch(payload);
-        // debugger;
         dispatch({type: TOGGLE_FILE_LOADING});
       })
       .catch(err => {
-        console.log(err);
+        if (err.response && err.response.status === 401) {
+          dispatch(push('/login'))
+        }
       });
+  };
+}
+
+export function clearFileState() {
+  return (dispatch) => {
+    dispatch({type: CLEAR_FILE_STATE});
   };
 }
 
@@ -60,7 +72,7 @@ export function uploadFile(file) {
           file: {id: response.data.id, name: response.data.file.originalname},
         };
         dispatch(payload);
-
+        dispatch(insertFileMessage(response.data.msg));
         dispatch({type: TOGGLE_FILE_LOADING});
       })
       .catch(err => {
@@ -72,8 +84,7 @@ export function uploadFile(file) {
 
 export function downloadFile(id, name) {
   return (dispatch, getState) => {
-    // var state = getState();
-    // console.log(state)
+
     let token = getState().user.token;
 
     if (!token) { return dispatch(push('/login')) };
@@ -111,9 +122,9 @@ export function deleteFile(id) {
             id
           };
           dispatch(payload);
+          dispatch(insertFileMessage(response.data.msg));
         };
         dispatch({type: TOGGLE_FILE_LOADING});
-        // fileDownload(response.data, name)
       })
       .catch(err => {
         console.log(err);
@@ -125,6 +136,12 @@ export function deleteFile(id) {
 export const reducer = createReducer(InitialStates.files, {
   [SET_FILES](state, action) {
     return Object.assign({}, state, action.files);
+  },
+  [CLEAR_FILE_STATE](state, action) {
+    return Object.assign({}, state, {files: [], gettingFiles: false, fileMessage: null});
+  },
+  [INSERT_FILE_MESSAGE](state, action) {
+    return Object.assign({}, state, {fileMessage: action.message});
   },
   [APPEND_FILE](state, action) {
     var existing_files = state.files;

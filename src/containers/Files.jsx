@@ -35,6 +35,7 @@ class Files extends Component {
 
     this.state = {
       uploadedFile: null,
+      fileMessage: null
     };
   }  
 
@@ -42,9 +43,21 @@ class Files extends Component {
     this.props.getFiles()
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.files.fileMessage !== this.props.files.fileMessage) {
+      this.setState({fileMessage: this.props.files.fileMessage});
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.state.uploadedFile || this.state.fileMessage) {
+      this.props.clearFileState();
+    }
+  }
+
   render() {
     const {files, gettingFiles} = this.props.files;
-    const {uploadedFile} = this.state;
+    const {uploadedFile, fileMessage} = this.state;
     if (gettingFiles) {
       return (
         <Box display="flex" justifyContent="center" alignItems="center">
@@ -113,7 +126,11 @@ class Files extends Component {
               </TableBody>
             </Table>
           </React.Fragment>
-
+        {fileMessage 
+          ? (
+              <p>{fileMessage}</p>
+          ) : null
+        }
         </Container>
       );
     }
@@ -127,6 +144,7 @@ const mapStateToProps = (state, ownProps) => ({
 
 const mapDispatchToProps = dispatch => ({
   getFiles: () => dispatch(FileContext.getFiles()),
+  clearFileState: () => dispatch(FileContext.clearFileState()),
   uploadFile: (file) => dispatch(FileContext.uploadFile(file)),
   downloadFile: (id, name) => dispatch(FileContext.downloadFile(id, name)),
   deleteFile: (id) => dispatch(FileContext.deleteFile(id)),
